@@ -33,6 +33,12 @@ Set max price to `0` if you only want free games (100% off not the free-to-play 
 
 Open in Android Studio, sync Gradle, run. Allow notifications or nothing will ping you. The "Test Notification" button shows what a notification looks like.
 
+# Interfaces
+
+| | | | |
+|---|---|---|---|
+| <img width="300" alt="Main screen" src="https://github.com/user-attachments/assets/af7c584d-ea44-415a-9e19-a2b78998c014" /> | <img width="300" alt="Settings" src="https://github.com/user-attachments/assets/2935ecf4-e78c-4ed2-b07f-06623bf0990b" /> | <img width="300" alt="Notification" src="https://github.com/user-attachments/assets/7495de38-39eb-41ac-a896-7a7b913aae8a" /> | <img width="300" alt="Deal list" src="https://github.com/user-attachments/assets/84a8629f-fd87-4824-bb86-e81414206fa8" /> |
+
 ## Notes
 
 - CheapShark lags behind Steam a bit, so notifications can come a few minutes late.
