@@ -4,24 +4,25 @@ import com.xmall75.steamdealsalert.data.remote.DealDto;
 
 public final class DealFilter {
 
-    private static final double MIN_SAVINGS = 99.99;
-
     private DealFilter() {}
 
-    /**
-     * @param minRatingPercent rating Steam minimum (0 = terima semua, termasuk yang belum punya rating)
-     */
-    public static boolean isFreePromo(DealDto d, int minRatingPercent) {
+    public static boolean isValidDeal(DealDto d, double maxPrice, int minRatingPercent) {
         if (d == null) return false;
 
         String appId = d.steamAppID;
         if (appId == null || appId.isEmpty() || "0".equals(appId)) return false;
 
-        if (toDouble(d.savings) < MIN_SAVINGS) return false;
-        if (toDouble(d.normalPrice) <= 0) return false;
-        if (toDouble(d.salePrice) > 0) return false;
+        double salePrice = toDouble(d.salePrice);
+        double savings = toDouble(d.savings);
+        int rating = toInt(d.steamRatingPercent);
 
-        return toInt(d.steamRatingPercent) >= minRatingPercent;
+        if (savings <= 0 || salePrice > maxPrice) return false;
+
+        if (minRatingPercent > 0 && rating > 0) {
+            return rating >= minRatingPercent;
+        }
+
+        return true;
     }
 
     public static double toDouble(String s) {

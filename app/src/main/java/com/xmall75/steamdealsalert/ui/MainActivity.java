@@ -1,13 +1,21 @@
 package com.xmall75.steamdealsalert.ui;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.xmall75.steamdealsalert.R;
 import com.xmall75.steamdealsalert.data.DealRepository;
 import com.xmall75.steamdealsalert.data.local.DealEntity;
 import com.xmall75.steamdealsalert.databinding.ActivityMainBinding;
+import com.xmall75.steamdealsalert.notification.NotificationHelper;
+import com.xmall75.steamdealsalert.worker.SyncRunner;
 
 import java.io.IOException;
 import java.util.List;
@@ -21,6 +29,11 @@ public class MainActivity extends AppCompatActivity {
     private DealRepository repository;
     private final ExecutorService io = Executors.newSingleThreadExecutor();
 
+    private final ActivityResultLauncher<String> notificationPermission =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted -> {
+                if (granted) sync();
+            });
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,7 +44,19 @@ public class MainActivity extends AppCompatActivity {
         repository.observeActive().observe(this, this::render);
 
         binding.btnSync.setOnClickListener(v -> sync());
-        sync();
+        binding.btnTestNotif.setOnClickListener(v -> sendTestNotification());
+
+        if (needsNotificationPermission()) {
+            notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS);
+        } else {
+            sync();
+        }
+    }
+
+    private boolean needsNotificationPermission() {
+        return Build.VERSION.SDK_INT >= 33
+                && ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED;
     }
 
     private void sync() {
@@ -41,8 +66,8 @@ public class MainActivity extends AppCompatActivity {
         io.execute(() -> {
             String status;
             try {
-                List<DealEntity> pending = repository.sync(0);
-                status = getString(R.string.status_ok, pending.size());
+                int sent = SyncRunner.syncAndNotify(getApplicationContext());
+                status = getString(R.string.status_ok, sent);
             } catch (IOException e) {
                 status = getString(R.string.status_error, e.getMessage());
             }
@@ -51,6 +76,36 @@ public class MainActivity extends AppCompatActivity {
                 binding.tvStatus.setText(result);
                 binding.btnSync.setEnabled(true);
             });
+        });
+    }
+
+    private void sendTestNotification() {
+        if (needsNotificationPermission()) {
+            notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS);
+            return;
+        }
+
+        if (!NotificationHelper.canNotify(this)) {
+            binding.tvStatus.setText(R.string.status_no_permission);
+            return;
+        }
+
+        io.execute(() -> {
+            try {
+                DealEntity fake = new DealEntity();
+                fake.steamAppId = "220";
+                fake.title = "Game Deals Example";
+                fake.normalPrice = 19.99;
+                fake.ratingPercent = 90;
+                fake.ratingText = "Very Positive";
+                fake.thumb = "";
+
+                NotificationHelper.notifyDeal(getApplicationContext(), fake);
+
+                runOnUiThread(() -> binding.tvStatus.setText("Test Notification Sent!"));
+            } catch (Exception e) {
+                runOnUiThread(() -> binding.tvStatus.setText("Gagal: " + e.getMessage()));
+            }
         });
     }
 

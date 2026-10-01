@@ -1,3 +1,3 @@
 <resources>
-    <style name="Theme.steamdealsalert" parent="Theme.Material3.DayNight" />
+    <style name="Theme.SteamDealsAlert" parent="Theme.Material3.DayNight" />
 </resources>

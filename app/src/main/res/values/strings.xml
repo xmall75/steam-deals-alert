@@ -1,9 +1,18 @@
 <resources>
     <string name="app_name">Steam Deals Alert</string>
     <string name="btn_sync">Sync</string>
-    <string name="status_idle">Idle</string>
-    <string name="status_syncing">Synchronizing…</string>
-    <string name="status_ok">Synchronized (%1$d promotions not yet notified)</string>
+    <string name="btn_test_notif">Test Notification</string>
+    <string name="status_idle">Not synchronized yet</string>
+    <string name="status_syncing">Synchronizing</string>
+    <string name="status_ok">Synchronization complete (%1$d notifications sent)</string>
     <string name="status_error">Failed: %1$s</string>
-    <string name="empty_list">There is no deals at the moment.</string>
+    <string name="status_no_permission">Notification permission has not been granted</string>
+    <string name="empty_list">There are no deals available right now.</string>
+
+    <string name="channel_name">Steam Deals</string>
+    <string name="channel_desc">Notifications when Steam games are on sale or free</string>
+    <string name="notif_title">Steam Deal: %1$s</string>
+    <string name="notif_text_rated">Sale price: $%1$.2f (Normal: $%2$.2f). Rating: %3$d%% (%4$s)</string>
+    <string name="notif_text_unrated">Sale price: $%1$.2f (Normal: $%2$.2f)</string>
+    <string name="notif_action_browser">Open in Browser</string>
 </resources>

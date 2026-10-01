@@ -12,6 +12,7 @@ public class DealEntity {
     public String steamAppId = "";
 
     public String title;
+    public double salePrice;
     public double normalPrice;
     public int ratingPercent;
     public String ratingText;

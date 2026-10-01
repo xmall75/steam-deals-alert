@@ -11,6 +11,12 @@
         android:layout_height="wrap_content"
         android:text="@string/btn_sync" />
 
+    <Button
+        android:id="@+id/btnTestNotif"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/btn_test_notif" />
+
     <TextView
         android:id="@+id/tvStatus"
         android:layout_width="match_parent"

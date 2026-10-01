@@ -35,8 +35,8 @@ public class DealRepository {
         return dao.observeActive();
     }
 
-    public List<DealEntity> sync(int minRatingPercent) throws IOException {
-        Response<List<DealDto>> response = api.getFreeDeals().execute();
+    public List<DealEntity> sync(double maxPrice, int minRatingPercent) throws IOException {
+        Response<List<DealDto>> response = api.getDeals(maxPrice).execute();
         List<DealDto> body = response.body();
         if (!response.isSuccessful() || body == null) {
             throw new IOException("HTTP " + response.code());
@@ -49,7 +49,8 @@ public class DealRepository {
             List<String> activeIds = new ArrayList<>();
 
             for (DealDto dto : body) {
-                if (!DealFilter.isFreePromo(dto, minRatingPercent)) continue;
+                if (!DealFilter.isValidDeal(dto, maxPrice, minRatingPercent)) continue;
+                if (dto.steamAppID == null || dto.steamAppID.trim().isEmpty()) continue;
                 if (!seen.add(dto.steamAppID)) continue;
 
                 DealEntity entity = dao.getById(dto.steamAppID);
@@ -63,7 +64,8 @@ public class DealRepository {
                     entity.notified = false;
                 }
 
-                entity.title = dto.title;
+                entity.title = dto.title != null ? dto.title : "Unknown Title";
+                entity.salePrice = DealFilter.toDouble(dto.salePrice);
                 entity.normalPrice = DealFilter.toDouble(dto.normalPrice);
                 entity.ratingPercent = DealFilter.toInt(dto.steamRatingPercent);
                 entity.ratingText = dto.steamRatingText;
@@ -86,8 +88,17 @@ public class DealRepository {
 
     public void markNotified(List<DealEntity> deals) {
         if (deals == null || deals.isEmpty()) return;
-        List<String> ids = new ArrayList<>();
-        for (DealEntity d : deals) ids.add(d.steamAppId);
-        dao.markNotified(ids);
+
+        db.runInTransaction(() -> {
+            List<String> ids = new ArrayList<>();
+            for (DealEntity d : deals) {
+                if (d != null && d.steamAppId != null) {
+                    ids.add(d.steamAppId);
+                }
+            }
+            if (!ids.isEmpty()) {
+                dao.markNotified(ids);
+            }
+        });
     }
 }
