@@ -5,11 +5,13 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.xmall75.steamdealsalert.R;
 import com.xmall75.steamdealsalert.data.DealRepository;
@@ -29,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
     private DealRepository repository;
+    private DealAdapter adapter;
     private final ExecutorService io = Executors.newSingleThreadExecutor();
 
     private final ActivityResultLauncher<String> notificationPermission =
@@ -41,6 +44,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        adapter = new DealAdapter();
+        binding.rvDeals.setLayoutManager(new LinearLayoutManager(this));
+        binding.rvDeals.setAdapter(adapter);
 
         startMonitoringService();
 
@@ -115,16 +122,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void render(List<DealEntity> deals) {
         if (deals == null || deals.isEmpty()) {
-            binding.tvDeals.setText(R.string.empty_list);
-            return;
+            binding.rvDeals.setVisibility(View.GONE);
+            binding.tvEmpty.setVisibility(View.VISIBLE);
+        } else {
+            binding.rvDeals.setVisibility(View.VISIBLE);
+            binding.tvEmpty.setVisibility(View.GONE);
+            adapter.setDeals(deals);
         }
-        StringBuilder sb = new StringBuilder();
-        for (DealEntity d : deals) {
-            sb.append(String.format(Locale.US, "%s%n  appid %s | normal $%.2f | rating %d%% (%s)%n%n",
-                    d.title, d.steamAppId, d.normalPrice, d.ratingPercent,
-                    d.ratingText == null ? "-" : d.ratingText));
-        }
-        binding.tvDeals.setText(sb.toString());
     }
 
     @Override

@@ -1,3 +1,15 @@
-<resources>
-    <style name="Theme.SteamDealsAlert" parent="Theme.Material3.DayNight" />
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.SteamDealsAlert" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/tn_purple</item>
+        <item name="colorOnPrimary">@color/tn_bg</item>
+
+        <!-- Status bar color -->
+        <item name="android:statusBarColor">@color/tn_bg</item>
+        <item name="android:windowLightStatusBar">false</item>
+
+        <item name="android:navigationBarColor">@color/tn_bg</item>
+    </style>
+
+    <style name="Theme.SteamDealsAlert" parent="Base.Theme.SteamDealsAlert" />
 </resources>

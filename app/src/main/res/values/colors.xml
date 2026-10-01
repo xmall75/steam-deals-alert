@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Tokyo Night Theme Palette -->
+    <color name="tn_bg">#1a1b26</color>          <!-- Dark Background -->
+    <color name="tn_card_bg">#24283b</color>     <!-- Darker Card Container -->
+    <color name="tn_card_border">#292e42</color> <!-- Card Border Accent -->
+
+    <color name="tn_purple">#7aa2f7</color>      <!-- Accent Primary (Blue/Purple) -->
+    <color name="tn_magenta">#bb9af7</color>     <!-- Accent Secondary -->
+    <color name="tn_cyan">#7dcfff</color>        <!-- Cyan Accent -->
+    <color name="tn_green">#9ece6a</color>       <!-- Success / Status OK -->
+
+    <color name="tn_text_main">#c0caf5</color>    <!-- Primary Text -->
+    <color name="tn_text_sub">#a9b1d6</color>     <!-- Secondary Text -->
+    <color name="tn_comment">#565f89</color>      <!-- Dimmed Text / Icons -->
+</resources>
