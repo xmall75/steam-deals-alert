@@ -2,7 +2,7 @@
 
 Side project. I kept claiming 100% off games (not the free-to-play games) by checking the store manually, so now the phone does it for me.
 
-Android app that notifies you when a Steam game goes free (or nearly free), so you can claim it before the promo ends.
+Android app that notifies you when Steam games go on sale, including the ones that hit 100% off (free to keep, not free-to-play), so you can grab them before the promo ends.
 
 ## Features
 
