@@ -12,6 +12,8 @@ public interface CheapSharkApi {
 
     @GET("deals?storeID=1&onSale=1")
     Call<List<DealDto>> getDeals(
-            @Query("upperPrice") double upperPrice
+            @Query("lowerPrice") double lowerPrice,
+            @Query("upperPrice") double upperPrice,
+            @Query("steamRating") int minRating
     );
 }

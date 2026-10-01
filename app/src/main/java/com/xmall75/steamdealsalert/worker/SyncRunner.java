@@ -4,8 +4,8 @@ import android.content.Context;
 
 import com.xmall75.steamdealsalert.R;
 import com.xmall75.steamdealsalert.data.DealRepository;
-import com.xmall75.steamdealsalert.data.Prefs;
 import com.xmall75.steamdealsalert.data.local.DealEntity;
+import com.xmall75.steamdealsalert.data.local.DealsPreferences;
 import com.xmall75.steamdealsalert.notification.NotificationHelper;
 import com.xmall75.steamdealsalert.service.DealsForegroundService;
 
@@ -18,9 +18,14 @@ public final class SyncRunner {
 
     public static synchronized int syncAndNotify(Context context) throws IOException {
         Context app = context.getApplicationContext();
-        DealRepository repository = new DealRepository(app);
 
-        List<DealEntity> pending = repository.sync(Prefs.getMaxPrice(app), Prefs.getMinRating(app));
+        DealsPreferences prefs = new DealsPreferences(context);
+        DealRepository repository = new DealRepository(app);
+        double minPrice = prefs.getMinPrice();
+        double maxPrice = prefs.getMaxPrice();
+        int minRating = prefs.getMinRating();
+
+        List<DealEntity> pending = repository.sync(minPrice, maxPrice, minRating);
 
         if (pending.isEmpty()) {
             DealsForegroundService.updateStatus(app, "All discounted games are notified");

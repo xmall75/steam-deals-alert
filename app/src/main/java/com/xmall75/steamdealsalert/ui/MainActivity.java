@@ -13,17 +13,19 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.google.android.material.textfield.TextInputEditText;
 import com.xmall75.steamdealsalert.R;
 import com.xmall75.steamdealsalert.data.DealRepository;
 import com.xmall75.steamdealsalert.data.local.DealEntity;
+import com.xmall75.steamdealsalert.data.local.DealsPreferences;
 import com.xmall75.steamdealsalert.databinding.ActivityMainBinding;
 import com.xmall75.steamdealsalert.notification.NotificationHelper;
 import com.xmall75.steamdealsalert.service.DealsForegroundService;
 import com.xmall75.steamdealsalert.worker.SyncRunner;
+import com.xmall75.steamdealsalert.worker.WorkScheduler;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -32,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private DealRepository repository;
     private DealAdapter adapter;
+    private DealsPreferences preferences;
     private final ExecutorService io = Executors.newSingleThreadExecutor();
 
     private final ActivityResultLauncher<String> notificationPermission =
@@ -49,12 +52,18 @@ public class MainActivity extends AppCompatActivity {
         binding.rvDeals.setLayoutManager(new LinearLayoutManager(this));
         binding.rvDeals.setAdapter(adapter);
 
+        preferences = new DealsPreferences(this);
+
+        binding.btnSync.setOnClickListener(v -> sync());
+        binding.btnTestNotif.setOnClickListener(v -> sendTestNotification());
+
         startMonitoringService();
 
         repository = new DealRepository(getApplicationContext());
         repository.observeActive().observe(this, this::render);
 
         binding.btnSync.setOnClickListener(v -> sync());
+        binding.btnSettings.setOnClickListener(v -> showSettingsDialog());
         binding.btnTestNotif.setOnClickListener(v -> sendTestNotification());
 
         if (needsNotificationPermission()) {
@@ -144,5 +153,44 @@ public class MainActivity extends AppCompatActivity {
         } else {
             startService(serviceIntent);
         }
+    }
+
+    private void showSettingsDialog() {
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_filter_settings, null);
+
+        TextInputEditText etMinPrice = dialogView.findViewById(R.id.etMinPrice);
+        TextInputEditText etMaxPrice = dialogView.findViewById(R.id.etMaxPrice);
+        TextInputEditText etMinRating = dialogView.findViewById(R.id.etMinRating);
+        TextInputEditText etMaxRating = dialogView.findViewById(R.id.etMaxRating);
+        TextInputEditText etInterval = dialogView.findViewById(R.id.etInterval);
+
+        etMinPrice.setText(String.valueOf(preferences.getMinPrice()));
+        etMaxPrice.setText(String.valueOf(preferences.getMaxPrice()));
+        etMinRating.setText(String.valueOf(preferences.getMinRating()));
+        etMaxRating.setText(String.valueOf(preferences.getMaxRating()));
+        etInterval.setText(String.valueOf(preferences.getSyncIntervalMinutes()));
+
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                .setTitle("Filter & Sync Settings")
+                .setView(dialogView)
+                .setPositiveButton("Save", (dialog, which) -> {
+                    try {
+                        float minP = Float.parseFloat(etMinPrice.getText().toString());
+                        float maxP = Float.parseFloat(etMaxPrice.getText().toString());
+                        int minR = Integer.parseInt(etMinRating.getText().toString());
+                        int maxR = Integer.parseInt(etMaxRating.getText().toString());
+                        int interval = Integer.parseInt(etInterval.getText().toString());
+
+                        preferences.saveFilterSettings(minP, maxP, minR, maxR, interval);
+
+                        WorkScheduler.schedule(this, interval, true);
+
+                        sync();
+                    } catch (NumberFormatException e) {
+                        binding.tvStatus.setText("Format input tidak valid!");
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
     }
 }

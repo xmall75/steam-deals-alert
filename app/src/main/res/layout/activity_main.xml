@@ -84,6 +84,17 @@
                 android:text="Sync"
                 android:textColor="@color/tn_bg"
                 app:backgroundTint="@color/btn_sync_background" />
+            <Space
+                android:layout_width="4dp"
+                android:layout_height="wrap_content" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSettings"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Settings"
+                android:textColor="@color/tn_bg"
+                app:backgroundTint="@color/btn_sync_background" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 

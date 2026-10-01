@@ -35,8 +35,10 @@ public class DealRepository {
         return dao.observeActive();
     }
 
-    public List<DealEntity> sync(double maxPrice, int minRatingPercent) throws IOException {
-        Response<List<DealDto>> response = api.getDeals(maxPrice).execute();
+    public List<DealEntity> sync(double minPrice, double maxPrice, int minRatingPercent) throws IOException {
+
+        Response<List<DealDto>> response = api.getDeals(minPrice, maxPrice, minRatingPercent).execute();
+
         List<DealDto> body = response.body();
         if (!response.isSuccessful() || body == null) {
             throw new IOException("HTTP " + response.code());
