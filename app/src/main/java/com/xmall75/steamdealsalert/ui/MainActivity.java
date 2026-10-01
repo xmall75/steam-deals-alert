@@ -1,6 +1,7 @@
 package com.xmall75.steamdealsalert.ui;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,6 +16,7 @@ import com.xmall75.steamdealsalert.data.DealRepository;
 import com.xmall75.steamdealsalert.data.local.DealEntity;
 import com.xmall75.steamdealsalert.databinding.ActivityMainBinding;
 import com.xmall75.steamdealsalert.notification.NotificationHelper;
+import com.xmall75.steamdealsalert.service.DealsForegroundService;
 import com.xmall75.steamdealsalert.worker.SyncRunner;
 
 import java.io.IOException;
@@ -39,6 +41,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        startMonitoringService();
 
         repository = new DealRepository(getApplicationContext());
         repository.observeActive().observe(this, this::render);
@@ -127,5 +131,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         io.shutdown();
+    }
+
+    private void startMonitoringService() {
+        Intent serviceIntent = new Intent(this, DealsForegroundService.class);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(serviceIntent);
+        } else {
+            startService(serviceIntent);
+        }
     }
 }
