@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Steam Deals Alert</string>
+    <string name="btn_sync">Sync</string>
+    <string name="status_idle">Idle</string>
+    <string name="status_syncing">Synchronizing…</string>
+    <string name="status_ok">Synchronized (%1$d promotions not yet notified)</string>
+    <string name="status_error">Failed: %1$s</string>
+    <string name="empty_list">There is no deals at the moment.</string>
+</resources>
