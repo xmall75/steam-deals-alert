@@ -22,8 +22,6 @@ import com.xmall75.steamdealsalert.data.local.DealEntity;
 import com.xmall75.steamdealsalert.data.remote.ApiClient;
 import com.xmall75.steamdealsalert.ui.OpenStoreActivity;
 
-import java.util.Locale;
-
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
@@ -81,8 +79,10 @@ public final class NotificationHelper {
                 deal.ratingPercent, deal.ratingText == null ? "-" : deal.ratingText)
                 : context.getString(R.string.notif_text_unrated, deal.salePrice, deal.normalPrice);
 
+        Bitmap appLogoBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_splash_logo);
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_notification)
+                .setSmallIcon(R.drawable.ic_splash_logo)
                 .setContentTitle(title)
                 .setContentText(text)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -91,14 +91,15 @@ public final class NotificationHelper {
                 .setAutoCancel(true)
                 .addAction(0, context.getString(R.string.notif_action_browser), webIntent);
 
-        Bitmap bitmap = fetchBitmap(deal.thumb);
-        if (bitmap != null) {
-            builder.setLargeIcon(bitmap)
+        Bitmap dealThumbBitmap = fetchBitmap(deal.thumb);
+        if (dealThumbBitmap != null) {
+            builder.setLargeIcon(dealThumbBitmap)
                     .setStyle(new NotificationCompat.BigPictureStyle()
-                            .bigPicture(bitmap)
+                            .bigPicture(dealThumbBitmap)
                             .bigLargeIcon((Bitmap) null));
         } else {
-            builder.setStyle(new NotificationCompat.BigTextStyle().bigText(text));
+            builder.setLargeIcon(appLogoBitmap)
+                    .setStyle(new NotificationCompat.BigTextStyle().bigText(text));
         }
 
         NotificationManagerCompat.from(context).notify(requestCode, builder.build());

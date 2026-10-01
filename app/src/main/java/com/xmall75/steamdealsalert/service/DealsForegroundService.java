@@ -7,6 +7,8 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.IBinder;
 
@@ -49,10 +51,13 @@ public class DealsForegroundService extends Service {
         }
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, mainIntent, pendingFlags);
 
+        Bitmap appLogoBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_splash_logo);
+
         return new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle("Steam Deals Alert Active")
-                .setContentText(message) // Deskripsi dinamis di sini
-                .setSmallIcon(R.drawable.ic_notification)
+                .setContentTitle("Active")
+                .setContentText(message)
+                .setSmallIcon(R.drawable.ic_splash_logo)
+                .setLargeIcon(appLogoBitmap)
                 .setContentIntent(pendingIntent)
                 .setOngoing(true)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
