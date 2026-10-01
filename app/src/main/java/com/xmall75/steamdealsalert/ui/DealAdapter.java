@@ -5,9 +5,7 @@ import android.content.Intent;
 import android.graphics.Paint;
 import android.net.Uri;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -15,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.xmall75.steamdealsalert.R;
 import com.xmall75.steamdealsalert.data.local.DealEntity;
+import com.xmall75.steamdealsalert.databinding.ItemDealCardBinding;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,8 +34,12 @@ public class DealAdapter extends RecyclerView.Adapter<DealAdapter.DealViewHolder
     @NonNull
     @Override
     public DealViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_deal_card, parent, false);
-        return new DealViewHolder(view);
+        ItemDealCardBinding binding = ItemDealCardBinding.inflate(
+                LayoutInflater.from(parent.getContext()),
+                parent,
+                false
+        );
+        return new DealViewHolder(binding);
     }
 
     @Override
@@ -52,36 +55,32 @@ public class DealAdapter extends RecyclerView.Adapter<DealAdapter.DealViewHolder
 
     static class DealViewHolder extends RecyclerView.ViewHolder {
 
-        private final TextView tvTitle, tvSalePrice, tvNormalPrice, tvAppId, tvRating;
+        private final ItemDealCardBinding binding;
 
-        public DealViewHolder(@NonNull View itemView) {
-            super(itemView);
-            tvTitle = itemView.findViewById(R.id.tvTitle);
-            tvSalePrice = itemView.findViewById(R.id.tvSalePrice);
-            tvNormalPrice = itemView.findViewById(R.id.tvNormalPrice);
-            tvAppId = itemView.findViewById(R.id.tvAppId);
-            tvRating = itemView.findViewById(R.id.tvRating);
+        public DealViewHolder(@NonNull ItemDealCardBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
         }
 
         public void bind(DealEntity deal) {
             Context context = itemView.getContext();
 
-            tvTitle.setText(deal.title);
-            tvSalePrice.setText(String.format(Locale.US, "$%.2f", deal.salePrice));
+            binding.tvTitle.setText(deal.title);
+            binding.tvSalePrice.setText(String.format(Locale.US, "$%.2f", deal.salePrice));
 
-            tvNormalPrice.setText(String.format(Locale.US, "$%.2f", deal.normalPrice));
-            tvNormalPrice.setPaintFlags(tvNormalPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+            binding.tvNormalPrice.setText(String.format(Locale.US, "$%.2f", deal.normalPrice));
+            binding.tvNormalPrice.setPaintFlags(binding.tvNormalPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
 
-            tvAppId.setText("AppID: " + deal.steamAppId);
+            binding.tvAppId.setText(String.format(Locale.US, "AppID: %s", deal.steamAppId));
 
             if (deal.ratingPercent >= 80) {
-                tvRating.setTextColor(ContextCompat.getColor(context, R.color.tn_green));
+                binding.tvRating.setTextColor(ContextCompat.getColor(context, R.color.tn_green));
             } else {
-                tvRating.setTextColor(ContextCompat.getColor(context, R.color.tn_magenta));
+                binding.tvRating.setTextColor(ContextCompat.getColor(context, R.color.tn_magenta));
             }
 
             String ratingText = deal.ratingText != null ? deal.ratingText : "-";
-            tvRating.setText(String.format(Locale.US, "Rating: %d%% (%s)", deal.ratingPercent, ratingText));
+            binding.tvRating.setText(String.format(Locale.US, "Rating: %d%% (%s)", deal.ratingPercent, ratingText));
 
             itemView.setOnClickListener(v -> {
                 String url = "https://store.steampowered.com/app/" + deal.steamAppId;

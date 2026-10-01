@@ -13,12 +13,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.google.android.material.textfield.TextInputEditText;
 import com.xmall75.steamdealsalert.R;
 import com.xmall75.steamdealsalert.data.DealRepository;
 import com.xmall75.steamdealsalert.data.local.DealEntity;
 import com.xmall75.steamdealsalert.data.local.DealsPreferences;
 import com.xmall75.steamdealsalert.databinding.ActivityMainBinding;
+import com.xmall75.steamdealsalert.databinding.DialogFilterSettingsBinding;
 import com.xmall75.steamdealsalert.notification.NotificationHelper;
 import com.xmall75.steamdealsalert.service.DealsForegroundService;
 import com.xmall75.steamdealsalert.worker.SyncRunner;
@@ -55,16 +55,13 @@ public class MainActivity extends AppCompatActivity {
         preferences = new DealsPreferences(this);
 
         binding.btnSync.setOnClickListener(v -> sync());
+        binding.btnSettings.setOnClickListener(v -> showSettingsDialog());
         binding.btnTestNotif.setOnClickListener(v -> sendTestNotification());
 
         startMonitoringService();
 
         repository = new DealRepository(getApplicationContext());
         repository.observeActive().observe(this, this::render);
-
-        binding.btnSync.setOnClickListener(v -> sync());
-        binding.btnSettings.setOnClickListener(v -> showSettingsDialog());
-        binding.btnTestNotif.setOnClickListener(v -> sendTestNotification());
 
         if (needsNotificationPermission()) {
             notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS);
@@ -156,30 +153,24 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showSettingsDialog() {
-        View dialogView = getLayoutInflater().inflate(R.layout.dialog_filter_settings, null);
+        DialogFilterSettingsBinding dialogBinding = DialogFilterSettingsBinding.inflate(getLayoutInflater());
 
-        TextInputEditText etMinPrice = dialogView.findViewById(R.id.etMinPrice);
-        TextInputEditText etMaxPrice = dialogView.findViewById(R.id.etMaxPrice);
-        TextInputEditText etMinRating = dialogView.findViewById(R.id.etMinRating);
-        TextInputEditText etMaxRating = dialogView.findViewById(R.id.etMaxRating);
-        TextInputEditText etInterval = dialogView.findViewById(R.id.etInterval);
-
-        etMinPrice.setText(String.valueOf(preferences.getMinPrice()));
-        etMaxPrice.setText(String.valueOf(preferences.getMaxPrice()));
-        etMinRating.setText(String.valueOf(preferences.getMinRating()));
-        etMaxRating.setText(String.valueOf(preferences.getMaxRating()));
-        etInterval.setText(String.valueOf(preferences.getSyncIntervalMinutes()));
+        dialogBinding.etMinPrice.setText(String.valueOf(preferences.getMinPrice()));
+        dialogBinding.etMaxPrice.setText(String.valueOf(preferences.getMaxPrice()));
+        dialogBinding.etMinRating.setText(String.valueOf(preferences.getMinRating()));
+        dialogBinding.etMaxRating.setText(String.valueOf(preferences.getMaxRating()));
+        dialogBinding.etInterval.setText(String.valueOf(preferences.getSyncIntervalMinutes()));
 
         new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
                 .setTitle("Filter & Sync Settings")
-                .setView(dialogView)
+                .setView(dialogBinding.getRoot())
                 .setPositiveButton("Save", (dialog, which) -> {
                     try {
-                        float minP = Float.parseFloat(etMinPrice.getText().toString());
-                        float maxP = Float.parseFloat(etMaxPrice.getText().toString());
-                        int minR = Integer.parseInt(etMinRating.getText().toString());
-                        int maxR = Integer.parseInt(etMaxRating.getText().toString());
-                        int interval = Integer.parseInt(etInterval.getText().toString());
+                        float minP = Float.parseFloat(dialogBinding.etMinPrice.getText().toString());
+                        float maxP = Float.parseFloat(dialogBinding.etMaxPrice.getText().toString());
+                        int minR = Integer.parseInt(dialogBinding.etMinRating.getText().toString());
+                        int maxR = Integer.parseInt(dialogBinding.etMaxRating.getText().toString());
+                        int interval = Integer.parseInt(dialogBinding.etInterval.getText().toString());
 
                         preferences.saveFilterSettings(minP, maxP, minR, maxR, interval);
 
